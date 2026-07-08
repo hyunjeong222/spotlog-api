@@ -1,4 +1,4 @@
-# src/main/resources/application.yml
+# src/main/resources/application.yaml
 server:
   port: 8085
 
@@ -13,10 +13,8 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: create
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 springdoc:

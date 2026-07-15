@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -29,6 +31,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 토큰이 있고 유효하면 SecurityContext에 인증 정보 저장
         if (token != null && jwtUtil.validateToken(token)) {
+            // 블랙리스트 체크
+            Boolean isBlacklisted = redisTemplate.hasKey("blacklist:" + token);
+            if (Boolean.TRUE.equals(isBlacklisted)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             String memberId = jwtUtil.getMemberId(token);
             String role = jwtUtil.getRole(token);
 

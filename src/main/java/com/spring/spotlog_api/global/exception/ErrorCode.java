@@ -17,7 +17,8 @@ public enum ErrorCode {
 
     // 회원
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
-    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
+    ALREADY_OWNER(HttpStatus.BAD_REQUEST, "이미 사업자 회원입니다.");
 
     private final HttpStatus status;
     private final String message;

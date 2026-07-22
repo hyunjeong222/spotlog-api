@@ -12,6 +12,9 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+    web:
+      pageable:
+        one-indexed-parameters: true
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -35,3 +38,7 @@ springdoc:
     operations-sorter: alpha
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+admin:
+  email: ${ADMIN_EMAIL}
+  password: ${ADMIN_PASSWORD}

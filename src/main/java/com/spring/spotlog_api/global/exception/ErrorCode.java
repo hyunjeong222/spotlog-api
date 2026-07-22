@@ -25,7 +25,10 @@ public enum ErrorCode {
     ALREADY_APPLIED(HttpStatus.CONFLICT, "이미 처리 중인 신청이 있습니다."),
     APPLICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신청입니다."),
     ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "이미 처리된 신청입니다."),
-    REJECTION_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "거절 사유는 필수입니다.");
+    REJECTION_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "거절 사유는 필수입니다."),
+    DUPLICATE_BUSINESS_NUMBER(HttpStatus.CONFLICT, "이미 등록된 사업자등록번호입니다."),
+
+    FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;

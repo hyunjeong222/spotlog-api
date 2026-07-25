@@ -27,8 +27,15 @@ public enum ErrorCode {
     ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "이미 처리된 신청입니다."),
     REJECTION_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "거절 사유는 필수입니다."),
     DUPLICATE_BUSINESS_NUMBER(HttpStatus.CONFLICT, "이미 등록된 사업자등록번호입니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
-    FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+    // 장소
+    PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장소입니다."),
+    ALREADY_ACTIVE_PLACE(HttpStatus.BAD_REQUEST, "이미 활성화된 장소입니다."),
+    ALREADY_INACTIVE_PLACE(HttpStatus.BAD_REQUEST, "이미 비활성화된 장소입니다."),
+    INVALID_TIME_RANGE(HttpStatus.BAD_REQUEST, "영업 종료 시간은 시작 시간보다 늦어야 합니다."),
+    INVALID_LOCATION(HttpStatus.BAD_REQUEST, "유효하지 않은 위치 정보입니다."),
+    NO_PLACE_PERMISSION(HttpStatus.FORBIDDEN, "장소에 대한 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;

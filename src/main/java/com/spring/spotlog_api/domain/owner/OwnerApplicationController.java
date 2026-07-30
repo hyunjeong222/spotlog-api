@@ -21,7 +21,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/owner-applications")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('CUSTOMER')")
 public class OwnerApplicationController {
     private final OwnerApplicationService ownerApplicationService;
 

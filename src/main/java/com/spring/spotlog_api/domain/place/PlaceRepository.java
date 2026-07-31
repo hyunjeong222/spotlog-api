@@ -16,4 +16,8 @@ public interface PlaceRepository extends JpaRepository<Place, UUID> {
 
     Page<Place> findByCategoryAndStatus(
             PlaceCategory category, PlaceStatus status, Pageable pageable);
+
+    // 같은 OWNER + 장소명 + 도로명주소 중복 체크
+    boolean existsByOwnerAndNameAndRoadAddress(
+            Member owner, String name, String roadAddress);
 }

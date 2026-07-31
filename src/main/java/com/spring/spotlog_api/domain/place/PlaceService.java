@@ -31,6 +31,12 @@ public class PlaceService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
+        // 같은 OWNER + 장소명 + 주소 중복 체크
+        if (placeRepository.existsByOwnerAndNameAndRoadAddress(
+                member, request.name(), request.roadAddress())) {
+            throw new CustomException(ErrorCode.DUPLICATE_PLACE);
+        }
+
         Place place = Place.create(
                 member,
                 request.category(),

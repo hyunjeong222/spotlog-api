@@ -37,7 +37,8 @@ public enum ErrorCode {
     ALREADY_INACTIVE_PLACE(HttpStatus.BAD_REQUEST, "이미 비활성화된 장소입니다."),
     INVALID_TIME_RANGE(HttpStatus.BAD_REQUEST, "영업 종료 시간은 시작 시간보다 늦어야 합니다."),
     INVALID_LOCATION(HttpStatus.BAD_REQUEST, "유효하지 않은 위치 정보입니다."),
-    NO_PLACE_PERMISSION(HttpStatus.FORBIDDEN, "장소에 대한 권한이 없습니다.");
+    NO_PLACE_PERMISSION(HttpStatus.FORBIDDEN, "장소에 대한 권한이 없습니다."),
+    DUPLICATE_PLACE(HttpStatus.CONFLICT, "이미 등록된 장소입니다.");
 
     private final HttpStatus status;
     private final String message;

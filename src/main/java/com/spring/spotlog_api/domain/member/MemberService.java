@@ -77,7 +77,7 @@ public class MemberService {
                 TimeUnit.MILLISECONDS
         );
 
-        return new LoginResponse(accessToken, refreshToken);
+        return new LoginResponse(member.getId(), accessToken, refreshToken);
     }
 
     // 토큰 재발급
@@ -111,6 +111,14 @@ public class MemberService {
         String newAccessToken = jwtUtil.generateAccessToken(memberId, member.getRole().name());
 
         return new ReissueResponse(newAccessToken);
+    }
+
+    // 마이페이지
+    @Transactional(readOnly = true)
+    public MemberResponse findMe(UUID memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return MemberResponse.from(member);
     }
 
     // 로그아웃

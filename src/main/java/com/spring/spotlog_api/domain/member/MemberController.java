@@ -1,6 +1,7 @@
 package com.spring.spotlog_api.domain.member;
 
 import com.spring.spotlog_api.domain.member.dto.*;
+import com.spring.spotlog_api.global.auth.LoginMember;
 import com.spring.spotlog_api.global.common.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/members")
@@ -35,6 +38,12 @@ public class MemberController {
             @RequestBody @Valid ReissueRequest request) {
         ReissueResponse response = memberService.reissue(request);
         return ResponseEntity.ok(ApiResponse.ok("토큰이 재발급되었습니다.", response));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MemberResponse>> findMe(@LoginMember UUID memberId) {
+        MemberResponse response = memberService.findMe(memberId);
+        return ResponseEntity.ok(ApiResponse.ok("내 정보 조회에 성공했습니다.", response));
     }
 
     @PostMapping("/logout")

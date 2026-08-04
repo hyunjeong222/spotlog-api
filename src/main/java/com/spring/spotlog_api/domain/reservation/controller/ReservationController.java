@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ReservationController {
     private final PessimisticReservationService reservationService;
 
     @PostMapping
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<ReservationResponse> reserve(
             @LoginMember UUID memberId,
             @Valid @RequestBody ReservationCreateRequest request
@@ -42,6 +44,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{reservationId}")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<Void> cancel(
             @LoginMember UUID memberId,
             @PathVariable Long reservationId

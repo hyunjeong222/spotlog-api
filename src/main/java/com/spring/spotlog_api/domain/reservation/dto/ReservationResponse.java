@@ -5,10 +5,11 @@ import com.spring.spotlog_api.domain.reservation.ReservationStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 public record ReservationResponse(
-    Long id,
-    Long optionId,
+    UUID id,
+    UUID optionId,
     LocalDate reservationDate,
     LocalTime startTime,
     LocalTime endTime,

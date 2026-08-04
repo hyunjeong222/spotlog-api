@@ -59,7 +59,7 @@ public class PessimisticReservationService {
     }
 
     @Transactional(readOnly = true)
-    public ReservationResponse findOne(UUID memberId, Long reservationId) {
+    public ReservationResponse findOne(UUID memberId, UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
@@ -70,7 +70,7 @@ public class PessimisticReservationService {
     }
 
     @Transactional
-    public void cancel(UUID memberId, Long reservationId) {
+    public void cancel(UUID memberId, UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 

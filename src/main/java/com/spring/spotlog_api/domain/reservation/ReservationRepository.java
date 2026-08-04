@@ -7,10 +7,10 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
     // 같은 옵션 + 날짜 + 시작시간 조합으로 이미 예약이 있는지 확인
     boolean existsByOption_IdAndReservationDateAndStartTimeAndStatus(
-            Long optionId, LocalDate reservationDate, LocalTime startTime, ReservationStatus status
+            UUID optionId, LocalDate reservationDate, LocalTime startTime, ReservationStatus status
     );
 
     // 조회

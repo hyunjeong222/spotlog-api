@@ -8,19 +8,20 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationOption {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "option_id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "option_id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     // 소속 장소
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id", nullable = false)
+    @JoinColumn(name = "place_id", nullable = false, columnDefinition = "BINARY(16)")
     private Place place;
 
     // 옵션명 (예: "2인 테이블", "스터디룸 A")

@@ -30,6 +30,7 @@ public class SecurityConfig {
             "/api/members/logout",
             "/api/places",
             "/api/places/{placeId}",
+            "/api/places/{placeId}/options",
             "/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html"

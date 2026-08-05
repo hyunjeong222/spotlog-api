@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record OwnerApplicationResponse (
         UUID id,
+        UUID memberId,
         String businessNumber,
         ApplicationStatus status,
         String reason,
@@ -17,6 +18,7 @@ public record OwnerApplicationResponse (
     public static OwnerApplicationResponse from(OwnerApplication application) {
         return new OwnerApplicationResponse(
                 application.getId(),
+                application.getMember().getId(),
                 application.getBusinessNumber(),
                 application.getStatus(),
                 application.getReason(),

@@ -22,6 +22,7 @@ public enum ErrorCode {
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호를 확인해 주세요."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
     ALREADY_OWNER(HttpStatus.BAD_REQUEST, "이미 사업자 회원입니다."),
+    NOT_OWNER(HttpStatus.BAD_REQUEST, "사업자 회원이 아닙니다."),
 
     // 사업자 신청
     ALREADY_APPLIED(HttpStatus.CONFLICT, "이미 처리 중인 신청이 있습니다."),
@@ -39,6 +40,7 @@ public enum ErrorCode {
     INVALID_LOCATION(HttpStatus.BAD_REQUEST, "유효하지 않은 위치 정보입니다."),
     NO_PLACE_PERMISSION(HttpStatus.FORBIDDEN, "장소에 대한 권한이 없습니다."),
     DUPLICATE_PLACE(HttpStatus.CONFLICT, "이미 등록된 장소입니다."),
+    ALREADY_DELETED_PLACE(HttpStatus.BAD_REQUEST, "이미 삭제된 장소입니다."),
 
     // 예약
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 옵션입니다."),

@@ -97,4 +97,14 @@ public class PlaceController {
         PlaceDetailResponse response = placeService.update(memberId, placeId, request);
         return ResponseEntity.ok(ApiResponse.ok("장소가 수정되었습니다.", response));
     }
+
+    // 장소 삭제
+    @DeleteMapping("/{placeId}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable UUID placeId) {
+        placeService.delete(memberId, placeId);
+        return ResponseEntity.noContent().build();
+    }
 }

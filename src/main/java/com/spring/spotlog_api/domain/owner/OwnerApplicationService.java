@@ -136,4 +136,12 @@ public class OwnerApplicationService {
 
         application.reject(reason);
     }
+
+    // 강제 권한 회수
+    @Transactional
+    public void revokeOwner(UUID memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        member.revokeOwner();
+    }
 }

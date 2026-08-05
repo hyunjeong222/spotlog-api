@@ -32,7 +32,7 @@ public class PlaceService {
         }
 
         // 같은 OWNER + 장소명 + 주소 중복 체크
-        if (placeRepository.existsByOwnerAndNameAndRoadAddress(
+        if (placeRepository.existsByOwnerAndNameAndRoadAddressAndDeletedFalse(
                 member, request.name(), request.roadAddress())) {
             throw new CustomException(ErrorCode.DUPLICATE_PLACE);
         }
@@ -59,20 +59,19 @@ public class PlaceService {
     public PageResponse<PlaceListResponse> getPlaces(
             PlaceCategory category, Pageable pageable) {
         Page<Place> page;
-
         if (category != null) {
-            page = placeRepository.findByCategoryAndStatus(
+            page = placeRepository.findByCategoryAndStatusAndDeletedFalse(
                     category, PlaceStatus.ACTIVE, pageable);
         } else {
-            page = placeRepository.findByStatus(PlaceStatus.ACTIVE, pageable);
+            page = placeRepository.findByStatusAndDeletedFalse(
+                    PlaceStatus.ACTIVE, pageable);
         }
-
         return PageResponse.from(page.map(PlaceListResponse::from));
     }
 
     // 장소 상세 조회
     public PlaceDetailResponse getPlace(UUID placeId) {
-        Place place = placeRepository.findById(placeId)
+        Place place = placeRepository.findByIdAndDeletedFalse(placeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
         return PlaceDetailResponse.from(place);
     }
@@ -82,8 +81,7 @@ public class PlaceService {
             String memberId, Pageable pageable) {
         Member member = memberRepository.findById(UUID.fromString(memberId))
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-        Page<Place> page = placeRepository.findByOwner(member, pageable);
+        Page<Place> page = placeRepository.findByOwnerAndDeletedFalse(member, pageable);
         return PageResponse.from(page.map(PlaceListResponse::from));
     }
 
@@ -125,5 +123,18 @@ public class PlaceService {
 
         place.update(request);
         return PlaceDetailResponse.from(place);
+    }
+
+    // 장소 삭제
+    @Transactional
+    public void delete(String memberId, UUID placeId) {
+        Place place = placeRepository.findByIdAndDeletedFalse(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+        if (!place.isOwnedBy(UUID.fromString(memberId))) {
+            throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
+        }
+
+        place.delete();
     }
 }

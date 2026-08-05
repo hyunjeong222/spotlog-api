@@ -69,4 +69,12 @@ public class Member {
         }
         this.role = MemberRole.OWNER;
     }
+
+    // OWNER → CUSTOMER 강제 권한 회수
+    public void revokeOwner() {
+        if (this.role != MemberRole.OWNER) {
+            throw new CustomException(ErrorCode.NOT_OWNER);
+        }
+        this.role = MemberRole.CUSTOMER;
+    }
 }

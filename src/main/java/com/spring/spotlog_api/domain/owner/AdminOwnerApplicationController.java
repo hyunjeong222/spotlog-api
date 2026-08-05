@@ -62,4 +62,11 @@ public class AdminOwnerApplicationController {
         ownerApplicationService.reject(applicationId, request.reason());
         return ResponseEntity.noContent().build();
     }
+
+    // 강제 권한 회수
+    @DeleteMapping("/members/{memberId}/owner-role")
+    public ResponseEntity<Void> revokeOwner(@PathVariable UUID memberId) {
+        ownerApplicationService.revokeOwner(memberId);
+        return ResponseEntity.noContent().build();
+    }
 }

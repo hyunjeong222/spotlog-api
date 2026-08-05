@@ -68,6 +68,9 @@ public class Place {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     private Place(Member owner, PlaceCategory category, String name,
                   String description, String roadAddress, String jibunAddress,
                   String postalCode, Double latitude, Double longitude,
@@ -169,5 +172,13 @@ public class Place {
             this.openTime = newOpenTime;
             this.closeTime = newCloseTime;
         }
+    }
+
+    // 장소 삭제 (소프트 삭제)
+    public void delete() {
+        if (this.deleted) {
+            throw new CustomException(ErrorCode.ALREADY_DELETED_PLACE);
+        }
+        this.deleted = true;
     }
 }

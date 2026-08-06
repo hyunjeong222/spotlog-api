@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ReservationOptionRepository extends JpaRepository<ReservationOption, Long> {
+public interface ReservationOptionRepository extends JpaRepository<ReservationOption, UUID> {
     // 비관적 락: 이 row를 조회하는 순간 트랜잭션 종료까지 다른 요청은 대기
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from ReservationOption o where o.id = :id")
     Optional<ReservationOption> findByIdForUpdate(@Param("id") UUID id);
 
     List<ReservationOption> findByPlace_Id(UUID placeId);
+
+    List<ReservationOption> findByPlace_IdAndStatus(UUID placeId, ReservationOptionStatus status);
 }

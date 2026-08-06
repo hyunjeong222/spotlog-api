@@ -4,6 +4,7 @@ import com.spring.spotlog_api.domain.place.Place;
 import com.spring.spotlog_api.domain.place.PlaceRepository;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionCreateRequest;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionResponse;
+import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionUpdateRequest;
 import com.spring.spotlog_api.global.exception.CustomException;
 import com.spring.spotlog_api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +35,69 @@ public class ReservationOptionService {
         return ReservationOptionResponse.from(optionRepository.save(option));
     }
 
+    // 공개용 - ACTIVE만
     @Transactional(readOnly = true)
-    public List<ReservationOptionResponse> findByPlace(UUID placeId) {
+    public List<ReservationOptionResponse> findActiveByPlace(UUID placeId) {
         if (!placeRepository.existsById(placeId)) {
             throw new CustomException(ErrorCode.PLACE_NOT_FOUND);
+        }
+        return optionRepository.findByPlace_IdAndStatus(placeId, ReservationOptionStatus.ACTIVE).stream()
+                .map(ReservationOptionResponse::from)
+                .toList();
+    }
+
+    // OWNER 전용 - 전체(ACTIVE + INACTIVE)
+    @Transactional(readOnly = true)
+    public List<ReservationOptionResponse> findAllByPlaceForOwner(UUID memberId, UUID placeId) {
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PLACE_NOT_FOUND));
+
+        if (!place.getOwner().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
         }
         return optionRepository.findByPlace_Id(placeId).stream()
                 .map(ReservationOptionResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationOptionResponse findOne(UUID optionId) {
+        ReservationOption option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+        return ReservationOptionResponse.from(option);
+    }
+
+    @Transactional
+    public ReservationOptionResponse update(UUID memberId, UUID optionId, ReservationOptionUpdateRequest request) {
+        ReservationOption option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+
+        if (!option.getPlace().getOwner().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
+        }
+        option.update(request.name(), request.capacity(), request.slotDurationMinutes());
+        return ReservationOptionResponse.from(option);
+    }
+
+    @Transactional
+    public void activate(UUID memberId, UUID optionId) {
+        ReservationOption option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+
+        if (!option.getPlace().getOwner().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
+        }
+        option.activate();
+    }
+
+    @Transactional
+    public void deactivate(UUID memberId, UUID optionId) {
+        ReservationOption option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+
+        if (!option.getPlace().getOwner().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
+        }
+        option.deactivate();
     }
 }

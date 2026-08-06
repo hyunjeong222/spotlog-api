@@ -9,6 +9,7 @@ import com.spring.spotlog_api.domain.reservation.dto.ReservationCreateRequest;
 import com.spring.spotlog_api.domain.reservation.dto.ReservationResponse;
 import com.spring.spotlog_api.domain.reservationoption.ReservationOption;
 import com.spring.spotlog_api.domain.reservationoption.ReservationOptionRepository;
+import com.spring.spotlog_api.domain.reservationoption.ReservationOptionStatus;
 import com.spring.spotlog_api.global.exception.CustomException;
 import com.spring.spotlog_api.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,10 @@ public class PessimisticReservationService {
         // 1. 옵션 row에 비관적 락을 걸어서, 같은 옵션에 대한 동시 요청을 순차 처리
         ReservationOption option = optionRepository.findByIdForUpdate(request.optionId())
                 .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+
+        if (option.getStatus() == ReservationOptionStatus.INACTIVE) {
+            throw new CustomException(ErrorCode.INACTIVE_OPTION);
+        }
 
         // 2. 락을 잡은 상태에서 같은 슬롯 중복 예약 여부 확인
         boolean alreadyReserved = reservationRepository

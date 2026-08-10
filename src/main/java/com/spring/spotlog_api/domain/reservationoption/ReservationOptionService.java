@@ -30,7 +30,7 @@ public class ReservationOptionService {
         }
 
         ReservationOption option = ReservationOption.create(
-                place, request.name(), request.capacity(), request.slotDurationMinutes()
+                place, request.name(), request.description(), request.capacity(), request.slotDurationMinutes()
         );
         return ReservationOptionResponse.from(optionRepository.save(option));
     }
@@ -75,7 +75,7 @@ public class ReservationOptionService {
         if (!option.getPlace().getOwner().getId().equals(memberId)) {
             throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
         }
-        option.update(request.name(), request.capacity(), request.slotDurationMinutes());
+        option.update(request.name(), request.description(), request.capacity(), request.slotDurationMinutes());
         return ReservationOptionResponse.from(option);
     }
 

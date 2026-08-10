@@ -30,6 +30,10 @@ public class ReservationOption {
     @Column(nullable = false)
     private String name;
 
+    // 옵션 설명
+    @Column(length = 500)
+    private String description;
+
     // 정원 (한 슬롯에 최대 몇 명/팀까지 수용 가능한지)
     @Column(nullable = false)
     private Integer capacity;
@@ -49,26 +53,23 @@ public class ReservationOption {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public static ReservationOption create(Place place, String name, Integer capacity, Integer slotDurationMinutes) {
+    public static ReservationOption create(Place place, String name, String description,
+                                           Integer capacity, Integer slotDurationMinutes) {
         ReservationOption option = new ReservationOption();
         option.place = place;
         option.name = name;
+        option.description = description;
         option.capacity = capacity;
         option.slotDurationMinutes = slotDurationMinutes;
         option.status = ReservationOptionStatus.ACTIVE;
         return option;
     }
 
-    public void update(String name, Integer capacity, Integer slotDurationMinutes) {
-        if (name != null) {
-            this.name = name;
-        }
-        if (capacity != null) {
-            this.capacity = capacity;
-        }
-        if (slotDurationMinutes != null) {
-            this.slotDurationMinutes = slotDurationMinutes;
-        }
+    public void update(String name, String description, Integer capacity, Integer slotDurationMinutes) {
+        if (name != null) this.name = name;
+        if (description != null) this.description = description;
+        if (capacity != null) this.capacity = capacity;
+        if (slotDurationMinutes != null) this.slotDurationMinutes = slotDurationMinutes;
     }
 
     public void activate() {

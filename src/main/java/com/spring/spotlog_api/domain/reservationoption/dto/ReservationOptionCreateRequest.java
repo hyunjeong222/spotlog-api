@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 
 public record ReservationOptionCreateRequest(
     @NotBlank String name,
+    String description,
     @NotNull @Positive Integer capacity,
     @NotNull @Positive Integer slotDurationMinutes
 ) { }

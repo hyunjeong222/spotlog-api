@@ -13,6 +13,7 @@ public record ReservationResponse(
     LocalDate reservationDate,
     LocalTime startTime,
     LocalTime endTime,
+    Integer quantity,
     ReservationStatus status
 ) {
     public static ReservationResponse from(Reservation reservation) {
@@ -22,6 +23,7 @@ public record ReservationResponse(
                 reservation.getReservationDate(),
                 reservation.getStartTime(),
                 reservation.getEndTime(),
+                reservation.getQuantity(),
                 reservation.getStatus()
         );
     }

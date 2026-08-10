@@ -52,6 +52,7 @@ public enum ErrorCode {
 
     // 예약 옵션
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 옵션입니다."),
+    EXCEEDS_CAPACITY(HttpStatus.BAD_REQUEST, "최대 인원을 초과했습니다."),
     ALREADY_INACTIVE_OPTION(HttpStatus.BAD_REQUEST, "이미 비활성화된 예약 옵션입니다."),
     INACTIVE_OPTION(HttpStatus.BAD_REQUEST, "비활성화된 예약 옵션입니다."),
     ALREADY_ACTIVE_OPTION(HttpStatus.BAD_REQUEST, "이미 활성화된 예약 옵션입니다.");

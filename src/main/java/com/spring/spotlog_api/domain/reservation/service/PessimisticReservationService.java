@@ -49,7 +49,7 @@ public class PessimisticReservationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Reservation reservation = Reservation.create(
-                member, option, request.reservationDate(), request.startTime(), request.endTime()
+                member, option, request.reservationDate(), request.startTime(), request.endTime(), request.quantity()
         );
 
         return ReservationResponse.from(reservationRepository.save(reservation));

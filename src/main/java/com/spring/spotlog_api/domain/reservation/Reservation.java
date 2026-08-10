@@ -49,6 +49,9 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime endTime;
 
+    @Column(nullable = false)
+    private Integer quantity;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
@@ -57,8 +60,9 @@ public class Reservation {
     private LocalDateTime createdAt;
 
     public static Reservation create(Member member, ReservationOption option,
-                                     LocalDate date, LocalTime startTime, LocalTime endTime) {
+                                     LocalDate date, LocalTime startTime, LocalTime endTime, Integer quantity) {
         validateTime(startTime, endTime);
+        validateQuantity(quantity, option.getCapacity());
 
         Reservation reservation = new Reservation();
         reservation.member = member;
@@ -66,6 +70,7 @@ public class Reservation {
         reservation.reservationDate = date;
         reservation.startTime = startTime;
         reservation.endTime = endTime;
+        reservation.quantity = quantity;
         reservation.status = ReservationStatus.RESERVED;
         return reservation;
     }
@@ -73,6 +78,12 @@ public class Reservation {
     private static void validateTime(LocalTime start, LocalTime end) {
         if (!start.isBefore(end)) {
             throw new CustomException(ErrorCode.INVALID_TIME_RANGE);
+        }
+    }
+
+    private static void validateQuantity(Integer quantity, Integer capacity) {
+        if (quantity > capacity) {
+            throw new CustomException(ErrorCode.EXCEEDS_CAPACITY);
         }
     }
 

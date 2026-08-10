@@ -9,6 +9,7 @@ public record ReservationOptionResponse(
     UUID id,
     UUID placeId,
     String name,
+    String description,
     Integer capacity,
     Integer slotDurationMinutes,
     ReservationOptionStatus status
@@ -18,6 +19,7 @@ public record ReservationOptionResponse(
                 option.getId(),
                 option.getPlace().getId(),
                 option.getName(),
+                option.getDescription(),
                 option.getCapacity(),
                 option.getSlotDurationMinutes(),
                 option.getStatus()

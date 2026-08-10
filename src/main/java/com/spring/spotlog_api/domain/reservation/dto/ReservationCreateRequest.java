@@ -2,6 +2,7 @@ package com.spring.spotlog_api.domain.reservation.dto;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,5 +12,6 @@ public record ReservationCreateRequest(
     @NotNull UUID optionId,
     @NotNull @Future LocalDate reservationDate,
     @NotNull LocalTime startTime,
-    @NotNull LocalTime endTime
+    @NotNull LocalTime endTime,
+    @NotNull @Positive Integer quantity
 ) { }

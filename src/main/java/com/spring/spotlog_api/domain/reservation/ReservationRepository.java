@@ -15,4 +15,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     // 조회
     List<Reservation> findByMember_IdOrderByReservationDateDescStartTimeDesc(UUID memberId);
+
+    // 예약된 시간 조회
+    List<Reservation> findByOption_IdAndReservationDateAndStatus(
+            UUID optionId, LocalDate reservationDate, ReservationStatus status
+    );
 }

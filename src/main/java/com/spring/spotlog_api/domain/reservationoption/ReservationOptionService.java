@@ -2,6 +2,11 @@ package com.spring.spotlog_api.domain.reservationoption;
 
 import com.spring.spotlog_api.domain.place.Place;
 import com.spring.spotlog_api.domain.place.PlaceRepository;
+import com.spring.spotlog_api.domain.reservation.Reservation;
+import com.spring.spotlog_api.domain.reservation.ReservationRepository;
+import com.spring.spotlog_api.domain.reservation.ReservationStatus;
+import com.spring.spotlog_api.domain.reservation.dto.AvailableSlotsResponse;
+import com.spring.spotlog_api.domain.reservation.dto.SlotResponse;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionCreateRequest;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionResponse;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionUpdateRequest;
@@ -11,14 +16,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ReservationOptionService {
     private final ReservationOptionRepository optionRepository;
     private final PlaceRepository placeRepository;
+    private final ReservationRepository reservationRepository;
 
     @Transactional
     public ReservationOptionResponse create(UUID memberId, UUID placeId, ReservationOptionCreateRequest request) {
@@ -99,5 +110,44 @@ public class ReservationOptionService {
             throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
         }
         option.deactivate();
+    }
+
+    // 슬롯 생성
+    @Transactional(readOnly = true)
+    public AvailableSlotsResponse findAvailableSlots(UUID optionId, LocalDate date) {
+        ReservationOption option = optionRepository.findById(optionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.OPTION_NOT_FOUND));
+
+        if (option.getStatus() == ReservationOptionStatus.INACTIVE) {
+            throw new CustomException(ErrorCode.INACTIVE_OPTION);
+        }
+
+        Place place = option.getPlace();
+
+        List<LocalTime> allSlots = generateSlots(
+                place.getOpenTime(), place.getCloseTime(), option.getSlotDurationMinutes()
+        );
+
+        Set<LocalTime> reservedTimes = reservationRepository
+                .findByOption_IdAndReservationDateAndStatus(optionId, date, ReservationStatus.RESERVED)
+                .stream()
+                .map(Reservation::getStartTime)
+                .collect(Collectors.toSet());
+
+        List<SlotResponse> slots = allSlots.stream()
+                .map(time -> new SlotResponse(time, !reservedTimes.contains(time)))
+                .toList();
+
+        return new AvailableSlotsResponse(date, slots);
+    }
+
+    private List<LocalTime> generateSlots(LocalTime open, LocalTime close, int durationMinutes) {
+        List<LocalTime> result = new ArrayList<>();
+        LocalTime cursor = open;
+        while (!cursor.plusMinutes(durationMinutes).isAfter(close)) {
+            result.add(cursor);
+            cursor = cursor.plusMinutes(durationMinutes);
+        }
+        return result;
     }
 }

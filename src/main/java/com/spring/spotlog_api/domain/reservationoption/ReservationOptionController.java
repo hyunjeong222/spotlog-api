@@ -1,5 +1,6 @@
 package com.spring.spotlog_api.domain.reservationoption;
 
+import com.spring.spotlog_api.domain.reservation.dto.AvailableSlotsResponse;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionCreateRequest;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionResponse;
 import com.spring.spotlog_api.domain.reservationoption.dto.ReservationOptionUpdateRequest;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -94,5 +96,15 @@ public class ReservationOptionController {
     ) {
         optionService.deactivate(memberId, optionId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{optionId}/available-slots")
+    public ResponseEntity<ApiResponse<AvailableSlotsResponse>> findAvailableSlots(
+            @PathVariable UUID placeId,
+            @PathVariable UUID optionId,
+            @RequestParam LocalDate date
+    ) {
+        AvailableSlotsResponse response = optionService.findAvailableSlots(optionId, date);
+        return ResponseEntity.ok(ApiResponse.ok("예약 가능 시간대 조회에 성공했습니다.", response));
     }
 }

@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,6 +37,8 @@ public class PessimisticReservationService {
         if (option.getStatus() == ReservationOptionStatus.INACTIVE) {
             throw new CustomException(ErrorCode.INACTIVE_OPTION);
         }
+
+        validateSlotAlignment(option, request.startTime(), request.endTime());
 
         // 2. 락을 잡은 상태에서 같은 슬롯 중복 예약 여부 확인
         boolean alreadyReserved = reservationRepository
@@ -80,5 +84,23 @@ public class PessimisticReservationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         reservation.cancel(memberId);
+    }
+
+    private void validateSlotAlignment(ReservationOption option, LocalTime startTime, LocalTime endTime) {
+        LocalTime optionStart = option.getAvailableStartTime();
+        LocalTime optionEnd = option.getAvailableEndTime();
+        int duration = option.getSlotDurationMinutes();
+
+        long minutesFromStart = Duration.between(optionStart, startTime).toMinutes();
+
+        boolean isAligned = minutesFromStart >= 0
+                && minutesFromStart % duration == 0
+                && startTime.plusMinutes(duration).equals(endTime)
+                && !startTime.isBefore(optionStart)
+                && !endTime.isAfter(optionEnd);
+
+        if (!isAligned) {
+            throw new CustomException(ErrorCode.INVALID_SLOT_TIME);
+        }
     }
 }

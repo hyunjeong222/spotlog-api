@@ -41,7 +41,8 @@ public class ReservationOptionService {
         }
 
         ReservationOption option = ReservationOption.create(
-                place, request.name(), request.description(), request.capacity(), request.slotDurationMinutes()
+                place, request.name(), request.description(), request.capacity(),
+                request.slotDurationMinutes(), request.availableStartTime(), request.availableEndTime()
         );
         return ReservationOptionResponse.from(optionRepository.save(option));
     }
@@ -86,7 +87,10 @@ public class ReservationOptionService {
         if (!option.getPlace().getOwner().getId().equals(memberId)) {
             throw new CustomException(ErrorCode.NO_PLACE_PERMISSION);
         }
-        option.update(request.name(), request.description(), request.capacity(), request.slotDurationMinutes());
+        option.update(
+                request.name(), request.description(), request.capacity(),
+                request.slotDurationMinutes(), request.availableStartTime(), request.availableEndTime()
+        );
         return ReservationOptionResponse.from(option);
     }
 
@@ -124,8 +128,9 @@ public class ReservationOptionService {
 
         Place place = option.getPlace();
 
+        // Option 기준
         List<LocalTime> allSlots = generateSlots(
-                place.getOpenTime(), place.getCloseTime(), option.getSlotDurationMinutes()
+                option.getAvailableStartTime(), option.getAvailableEndTime(), option.getSlotDurationMinutes()
         );
 
         Set<LocalTime> reservedTimes = reservationRepository

@@ -1,5 +1,8 @@
 # application-local.yaml
 spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 30
   jpa:
     show-sql: true
     properties:

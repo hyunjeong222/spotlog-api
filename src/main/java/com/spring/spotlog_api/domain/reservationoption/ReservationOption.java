@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -42,6 +43,12 @@ public class ReservationOption {
     @Column(nullable = false)
     private Integer slotDurationMinutes;
 
+    @Column(nullable = false)
+    private LocalTime availableStartTime;
+
+    @Column(nullable = false)
+    private LocalTime availableEndTime;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationOptionStatus status;
@@ -54,22 +61,34 @@ public class ReservationOption {
     private LocalDateTime createdAt;
 
     public static ReservationOption create(Place place, String name, String description,
-                                           Integer capacity, Integer slotDurationMinutes) {
+                                           Integer capacity, Integer slotDurationMinutes,
+                                           LocalTime availableStartTime, LocalTime availableEndTime) {
         ReservationOption option = new ReservationOption();
         option.place = place;
         option.name = name;
         option.description = description;
         option.capacity = capacity;
         option.slotDurationMinutes = slotDurationMinutes;
+        option.availableStartTime = availableStartTime;
+        option.availableEndTime = availableEndTime;
         option.status = ReservationOptionStatus.ACTIVE;
         return option;
     }
 
-    public void update(String name, String description, Integer capacity, Integer slotDurationMinutes) {
+    public void update(String name, String description, Integer capacity, Integer slotDurationMinutes,
+                       LocalTime availableStartTime, LocalTime availableEndTime) {
         if (name != null) this.name = name;
         if (description != null) this.description = description;
         if (capacity != null) this.capacity = capacity;
         if (slotDurationMinutes != null) this.slotDurationMinutes = slotDurationMinutes;
+
+        if (availableStartTime != null || availableEndTime != null) {
+            LocalTime newStart = availableStartTime != null ? availableStartTime : this.availableStartTime;
+            LocalTime newEnd = availableEndTime != null ? availableEndTime : this.availableEndTime;
+            validateWithinPlaceHours(this.place, newStart, newEnd);
+            this.availableStartTime = newStart;
+            this.availableEndTime = newEnd;
+        }
     }
 
     public void activate() {
@@ -84,5 +103,14 @@ public class ReservationOption {
             throw new CustomException(ErrorCode.ALREADY_INACTIVE_OPTION);
         }
         this.status = ReservationOptionStatus.INACTIVE;
+    }
+
+    private static void validateWithinPlaceHours(Place place, LocalTime start, LocalTime end) {
+        if (!start.isBefore(end)) {
+            throw new CustomException(ErrorCode.INVALID_RESERVATION_TIME_RANGE);
+        }
+        if (start.isBefore(place.getOpenTime()) || end.isAfter(place.getCloseTime())) {
+            throw new CustomException(ErrorCode.OPTION_TIME_OUT_OF_PLACE_HOURS);
+        }
     }
 }

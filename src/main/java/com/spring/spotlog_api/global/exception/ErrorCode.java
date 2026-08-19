@@ -49,6 +49,8 @@ public enum ErrorCode {
     INVALID_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "잘못된 상태 변경입니다."),
     NO_RESERVATION_PERMISSION(HttpStatus.FORBIDDEN, "예약에 대한 권한이 없습니다."),
     LOCK_ACQUISITION_FAILED(HttpStatus.CONFLICT, "예약 요청이 몰려 처리에 실패했습니다. 다시 시도해 주세요."),
+    OPTION_TIME_OUT_OF_PLACE_HOURS(HttpStatus.BAD_REQUEST, "예약 옵션의 운영 시간은 장소의 영업 시간 내에 있어야 합니다."),
+    INVALID_SLOT_TIME(HttpStatus.BAD_REQUEST, "유효하지 않은 예약 시간입니다."),
 
     // 예약 옵션
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 옵션입니다."),

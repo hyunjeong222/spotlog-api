@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record ReservationCreateRequest(
     @NotNull UUID optionId,
-    @NotNull @Future LocalDate reservationDate,
+    @NotNull @Future(message = "예약 가능한 날짜가 아닙니다") LocalDate reservationDate,
     @NotNull LocalTime startTime,
     @NotNull LocalTime endTime,
     @NotNull @Positive Integer quantity

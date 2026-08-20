@@ -63,6 +63,8 @@ public class ReservationOption {
     public static ReservationOption create(Place place, String name, String description,
                                            Integer capacity, Integer slotDurationMinutes,
                                            LocalTime availableStartTime, LocalTime availableEndTime) {
+        validateWithinPlaceHours(place, availableStartTime, availableEndTime);
+
         ReservationOption option = new ReservationOption();
         option.place = place;
         option.name = name;

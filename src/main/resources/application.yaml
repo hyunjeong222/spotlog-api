@@ -42,3 +42,9 @@ springdoc:
 admin:
   email: ${ADMIN_EMAIL}
   password: ${ADMIN_PASSWORD}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

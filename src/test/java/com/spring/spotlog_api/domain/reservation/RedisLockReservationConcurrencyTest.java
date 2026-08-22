@@ -8,6 +8,7 @@ import com.spring.spotlog_api.domain.place.PlaceCategory;
 import com.spring.spotlog_api.domain.place.PlaceRepository;
 import com.spring.spotlog_api.domain.reservation.dto.ReservationCreateRequest;
 import com.spring.spotlog_api.domain.reservation.service.PessimisticReservationService;
+import com.spring.spotlog_api.domain.reservation.service.RedisLockReservationService;
 import com.spring.spotlog_api.domain.reservationoption.ReservationOption;
 import com.spring.spotlog_api.domain.reservationoption.ReservationOptionRepository;
 import com.spring.spotlog_api.support.ContainerBaseTest;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,9 +28,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
-class PessimisticReservationConcurrencyTest extends ContainerBaseTest {
-    @Autowired private PessimisticReservationService reservationService;
+class RedisLockReservationConcurrencyTest extends ContainerBaseTest {
+    @Autowired private RedisLockReservationService reservationService;
     @Autowired private MemberRepository memberRepository;
     @Autowired private PlaceRepository placeRepository;
     @Autowired private ReservationOptionRepository optionRepository;
@@ -77,8 +79,11 @@ class PessimisticReservationConcurrencyTest extends ContainerBaseTest {
     @Test
     void 같은_슬롯에_100명이_동시에_요청하면_1명만_성공한다() throws InterruptedException {
         int threadCount = 100;
-        ExecutorService executorService = Executors.newFixedThreadPool(32);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+
+        CountDownLatch readyLatch = new CountDownLatch(threadCount);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
 
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger failCount = new AtomicInteger();
@@ -90,17 +95,26 @@ class PessimisticReservationConcurrencyTest extends ContainerBaseTest {
         for (UUID customerId : customerIds) {
             executorService.submit(() -> {
                 try {
+                    // 모든 스레드가 작업 준비를 마쳤음을 표시
+                    readyLatch.countDown();
+                    // 모든 스레드가 여기서 대기
+                    startLatch.await();
                     reservationService.reserve(customerId, request);
                     successCount.incrementAndGet();
                 } catch (Exception e) {
                     failCount.incrementAndGet();
                 } finally {
-                    latch.countDown();
+                    doneLatch.countDown();
                 }
             });
         }
 
-        latch.await();
+        // 100개 스레드가 모두 준비될 때까지 대기
+        readyLatch.await();
+        // 동시에 시작
+        startLatch.countDown();
+        // 모든 요청 종료까지 대기
+        doneLatch.await();
         executorService.shutdown();
 
         assertThat(successCount.get()).isEqualTo(1);
